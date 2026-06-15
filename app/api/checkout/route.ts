@@ -37,16 +37,7 @@ export async function POST(req: NextRequest) {
     ],
     metadata: { parcel_id: String(parcel.id), address: parcel.situs_address },
     success_url: `${config.NEXT_PUBLIC_BASE_URL}/order/{CHECKOUT_SESSION_ID}`,
-    cancel_url: (() => {
-      const base = config.NEXT_PUBLIC_BASE_URL;
-      if (base.includes("localhost")) {
-        const subdomain = slugToSubdomain(parcel.county_slug);
-        return `${base}/${subdomain}/${parcel.county_slug}/${parcel.account_id}`;
-      }
-      const subdomain = slugToSubdomain(parcel.county_slug);
-      const host = new URL(base).hostname;
-      return `https://${subdomain}.${host}/${parcel.county_slug}/${parcel.account_id}`;
-    })(),
+    cancel_url: `${config.NEXT_PUBLIC_BASE_URL}/${slugToSubdomain(parcel.county_slug)}/${parcel.county_slug}/${parcel.account_id}`,
   });
 
   return NextResponse.json({ url: session.url });

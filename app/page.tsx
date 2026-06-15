@@ -11,13 +11,8 @@ const STATES = [
   { name: "Arizona", subdomain: "arizona", available: false },
 ];
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://housedata.us";
-const IS_LOCAL = BASE_URL.includes("localhost");
-
 function getStateUrl(subdomain: string): string {
-  if (IS_LOCAL) return `/${subdomain}`;
-  const rootHost = new URL(BASE_URL).hostname.replace(/^www\./, "");
-  return `https://${subdomain}.${rootHost}`;
+  return `/${subdomain}`;
 }
 
 export default function Home() {
