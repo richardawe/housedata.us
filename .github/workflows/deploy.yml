@@ -37,8 +37,10 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
           local-dir: .next/standalone/
-          server-dir: housedata.us/
+          server-dir: /
 
       - name: Restart Passenger via cPanel API
         run: |
