@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,29 +19,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Type check
+        run: npx tsc --noEmit
         env:
           NEXT_PUBLIC_BASE_URL: https://housedata.us
 
-      - name: Bundle standalone output
-        run: |
-          cp -r .next/static  .next/standalone/.next/static
-          cp -r public        .next/standalone/public
-
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          local-dir: .next/standalone/
-          server-dir: /
-
-      - name: Restart app
+      - name: Trigger server build
         run: |
           curl -sf -X POST https://housedata.us/api/deploy \
             -H "Authorization: Bearer ${{ secrets.DEPLOY_SECRET }}" \
-            --max-time 15 || echo "Restart endpoint not yet live — restart PM2 manually"
+            --max-time 15
