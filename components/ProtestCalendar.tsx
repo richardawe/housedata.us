@@ -6,6 +6,7 @@ import {
   getProtestEvents,
   getEventsForDay,
   getPrimaryEventType,
+  todayISO,
   EVENT_META,
   EVENT_PRIORITY,
   STATE_FILTERS,
@@ -18,11 +19,6 @@ const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function pad(n: number): string {
   return String(n).padStart(2, "0");
-}
-
-function todayISO(): string {
-  const t = new Date();
-  return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
 }
 
 function formatDateRange(start: string, end: string): string {

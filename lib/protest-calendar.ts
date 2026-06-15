@@ -84,6 +84,12 @@ export const STATE_FILTERS = [
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
+export function todayISO(): string {
+  const t = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+}
+
 function p(n: number): string {
   return String(n).padStart(2, '0');
 }
@@ -383,11 +389,19 @@ export function getPrimaryEventType(dayEvents: ProtestEvent[]): EventType | null
 }
 
 /** Returns upcoming events for a specific state, sorted by startDate. */
-export function getUpcomingForState(stateCode: string, limit = 3): ProtestEvent[] {
-  const today = new Date().toISOString().slice(0, 10);
+export function getUpcomingForState(
+  stateCode: string,
+  limit = 3,
+  types?: EventType[],
+): ProtestEvent[] {
+  const today = todayISO();
   const year = new Date().getFullYear();
   const all = getProtestEvents([year, year + 1]);
   return all
-    .filter(e => e.state === stateCode && e.endDate >= today)
+    .filter(e =>
+      e.state === stateCode &&
+      e.endDate >= today &&
+      (!types || types.includes(e.type))
+    )
     .slice(0, limit);
 }

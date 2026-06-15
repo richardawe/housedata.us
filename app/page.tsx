@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { getProtestEvents } from "@/lib/protest-calendar";
+import { getProtestEvents, todayISO } from "@/lib/protest-calendar";
 
 const STATES = [
   { name: "Texas",          subdomain: "texas",          available: true  },
@@ -16,12 +16,6 @@ const STATES = [
 
 function getStateUrl(subdomain: string): string {
   return `/${subdomain}`;
-}
-
-function todayISO(): string {
-  const t = new Date();
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`;
 }
 
 export default function Home() {

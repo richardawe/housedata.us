@@ -4,7 +4,12 @@ import { useRef, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import AddressSearch from "@/components/AddressSearch";
 import { use } from "react";
-import { getProtestEvents } from "@/lib/protest-calendar";
+import {
+  getUpcomingForState,
+  todayISO,
+  MONTH_NAMES,
+} from "@/lib/protest-calendar";
+import { subdomainToStateCode } from "@/lib/states";
 
 const TexasMap = dynamic(() => import("@/components/TexasMap"), { ssr: false });
 
@@ -17,39 +22,13 @@ const STATE_LAUNCH_COUNTY: Record<string, string> = {
   texas: "travis-tx",
 };
 
-// Map state subdomain → state code
-const STATE_CODES: Record<string, string> = {
-  texas:          "TX",
-  california:     "CA",
-  florida:        "FL",
-  "new-york":     "NY",
-  illinois:       "IL",
-  georgia:        "GA",
-  "north-carolina": "NC",
-  arizona:        "AZ",
-};
-
-const SHORT_MONTHS = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec",
-];
-
-function todayISO(): string {
-  const t = new Date();
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`;
-}
-
 function DeadlineBanner({ stateCode }: { stateCode: string }) {
   const today = todayISO();
-  const year  = parseInt(today.slice(0, 4), 10);
 
-  const upcoming = useMemo(() => {
-    const all = getProtestEvents([year, year + 1]);
-    return all
-      .filter((e) => e.state === stateCode && e.endDate >= today)
-      .slice(0, 2);
-  }, [stateCode, today, year]);
+  const upcoming = useMemo(
+    () => getUpcomingForState(stateCode, 2, ["deadline", "filing-window"]),
+    [stateCode],
+  );
 
   if (!upcoming.length) return null;
 
@@ -72,7 +51,7 @@ function DeadlineBanner({ stateCode }: { stateCode: string }) {
                 {e.county && <span className="text-amber-600"> · {e.county}</span>}
               </span>
               <span className={`font-medium whitespace-nowrap ml-3 ${isActive ? "text-emerald-600" : "text-amber-700"}`}>
-                {isActive ? "Active now" : `${SHORT_MONTHS[sm - 1]} ${sd}`}
+                {isActive ? "Active now" : `${MONTH_NAMES[sm - 1].slice(0, 3)} ${sd}`}
               </span>
             </li>
           );
@@ -85,7 +64,7 @@ function DeadlineBanner({ stateCode }: { stateCode: string }) {
 export default function StatePage({ params }: Props) {
   const { state } = use(params);
   const launchCounty = STATE_LAUNCH_COUNTY[state] ?? "";
-  const stateCode    = STATE_CODES[state] ?? "";
+  const stateCode    = subdomainToStateCode(state);
 
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
