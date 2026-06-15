@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getParcelWithAnalysis, getCompRows } from "@/lib/db/queries";
 import { usd, pct, num } from "@/lib/format";
-import { DEADLINE_PASSED, PACKET_PRICE_USD } from "@/lib/config";
+import { DEADLINE_PASSED } from "@/lib/config";
+import DownloadPacketButton from "@/components/DownloadPacketButton";
 
 export const revalidate = 60;
 
@@ -104,9 +105,18 @@ export default async function ResultPage({ params }: Props) {
           </div>
         )}
 
-        {/* CTA */}
+        {/* Download packet */}
         {hasAnalysis && !DEADLINE_PASSED && (
-          <CTACard parcelId={parcel.id} county={county} />
+          <div className="bg-blue-600 text-white rounded-xl p-6">
+            <h2 className="text-xl font-bold mb-1">Get the full evidence packet — free</h2>
+            <ul className="text-blue-100 text-sm space-y-1 mb-4">
+              <li>✓ Full equity comps table (ready to hand to the ARB)</li>
+              <li>✓ Pre-filled Form 50-132 (Texas Notice of Protest)</li>
+              <li>✓ Step-by-step filing instructions + hearing script</li>
+              <li>✓ Instant PDF download, no account required</li>
+            </ul>
+            <DownloadPacketButton county={county} accountId={parcel.account_id} />
+          </div>
         )}
         {DEADLINE_PASSED && (
           <div className="bg-gray-100 rounded-xl p-5 text-center text-sm text-gray-600">
@@ -194,28 +204,6 @@ function ValueBox({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CTACard({ parcelId, county }: { parcelId: string; county: string }) {
-  return (
-    <div className="bg-blue-600 text-white rounded-xl p-6">
-      <h2 className="text-xl font-bold mb-1">Get the full evidence packet — ${PACKET_PRICE_USD}</h2>
-      <ul className="text-blue-100 text-sm space-y-1 mb-4">
-        <li>✓ Full equity comps table (ready to hand to the ARB)</li>
-        <li>✓ Pre-filled Form 50-132 (Texas Notice of Protest)</li>
-        <li>✓ Step-by-step filing instructions + hearing script</li>
-        <li>✓ Instant download, one-time fee</li>
-      </ul>
-      <Link
-        href={`/checkout/${parcelId}`}
-        className="block w-full text-center bg-white text-blue-700 font-semibold py-3 rounded-lg hover:bg-blue-50 transition"
-      >
-        Get my evidence packet →
-      </Link>
-      <p className="text-xs text-blue-200 mt-3 text-center">
-        Full refund if the packet contains a material data error.
-      </p>
-    </div>
-  );
-}
 
 function truncateAddress(addr: string): string {
   const parts = addr.split(" ");

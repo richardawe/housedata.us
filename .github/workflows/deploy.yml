@@ -28,8 +28,6 @@ jobs:
         run: |
           cp -r .next/static  .next/standalone/.next/static
           cp -r public        .next/standalone/public
-          cp server.js        .next/standalone/server.js
-          mkdir -p .next/standalone/tmp
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -42,10 +40,8 @@ jobs:
           local-dir: .next/standalone/
           server-dir: /
 
-      - name: Restart Passenger via cPanel API
+      - name: Restart app
         run: |
-          curl -sk \
-            -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            "https://${{ secrets.FTP_SERVER }}:2083/execute/Fileman/save_file_content" \
-            -d "dir=%2Fhome%2Fhousedataus%2Fhousedata.us%2Ftmp&filename=restart.txt&content=" \
-            -o /dev/null -w "%{http_code}"
+          curl -sf -X POST https://housedata.us/api/deploy \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_SECRET }}" \
+            --max-time 15 || echo "Restart endpoint not yet live — restart PM2 manually"

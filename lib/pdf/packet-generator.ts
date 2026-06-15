@@ -2,8 +2,6 @@ import {
   PDFDocument, PDFPage, rgb, StandardFonts,
   type PDFFont,
 } from "pdf-lib";
-import fs from "fs";
-import path from "path";
 import https from "https";
 import type { ParcelResult, CompRow } from "../db/queries";
 
@@ -12,39 +10,26 @@ const FORM_50_132_URL = "https://comptroller.texas.gov/forms/50-132.pdf";
 // ─────────────────────────────────────────────────────────────────────────────
 // Main entry point
 // ─────────────────────────────────────────────────────────────────────────────
-export async function generatePacket(options: {
+export async function generatePacketBytes(options: {
   parcel: ParcelResult;
   comps: CompRow[];
   ownerName: string;
   countyName: string;
   protestDeadline: string;
   efileUrl: string;
-  outputPath: string;
-}): Promise<void> {
-  const { parcel, comps, ownerName, countyName, protestDeadline, efileUrl, outputPath } = options;
+}): Promise<Uint8Array> {
+  const { parcel, comps, ownerName, countyName, protestDeadline, efileUrl } = options;
 
   const doc = await PDFDocument.create();
   const helvetica = await doc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  // Page 1: Cover summary
   await addCoverPage(doc, { parcel, ownerName, countyName, helvetica, helveticaBold });
-
-  // Page 2: Equity comps table
   await addCompsPage(doc, { parcel, comps, helvetica, helveticaBold });
-
-  // Page 3: Filing instructions
   await addInstructionsPage(doc, { parcel, ownerName, countyName, protestDeadline, efileUrl, helvetica, helveticaBold });
-
-  // Append filled Form 50-132
   await appendForm50132(doc, { parcel, ownerName });
 
-  const pdfBytes = await doc.save();
-
-  // Ensure output directory exists
-  const dir = path.dirname(outputPath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(outputPath, pdfBytes);
+  return doc.save();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
