@@ -107,15 +107,19 @@ export default async function ResultPage({ params }: Props) {
 
         {/* Download packet */}
         {hasAnalysis && !DEADLINE_PASSED && (
-          <div className="bg-blue-600 text-white rounded-xl p-6">
-            <h2 className="text-xl font-bold mb-1">Get the full evidence packet — free</h2>
-            <ul className="text-blue-100 text-sm space-y-1 mb-4">
-              <li>✓ Full equity comps table (ready to hand to the ARB)</li>
-              <li>✓ Pre-filled Form 50-132 (Texas Notice of Protest)</li>
-              <li>✓ Step-by-step filing instructions + hearing script</li>
-              <li>✓ Instant PDF download, no account required</li>
-            </ul>
-            <DownloadPacketButton county={county} accountId={parcel.account_id} />
+          <div className="rounded-xl border border-blue-200 overflow-hidden">
+            <div className="bg-blue-600 text-white px-6 py-5">
+              <h2 className="text-xl font-bold mb-1">Get the full evidence packet — free</h2>
+              <ul className="text-blue-100 text-sm space-y-1">
+                <li>✓ Full equity comps table (ready to hand to the ARB)</li>
+                <li>✓ Pre-filled Form 50-132 (Texas Notice of Protest)</li>
+                <li>✓ Step-by-step filing instructions + hearing script</li>
+                <li>✓ Instant PDF download, no account required</li>
+              </ul>
+            </div>
+            <div className="bg-white px-6 py-4">
+              <DownloadPacketButton county={county} accountId={parcel.account_id} />
+            </div>
           </div>
         )}
         {DEADLINE_PASSED && (

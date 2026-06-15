@@ -43,7 +43,7 @@ export default function DownloadPacketButton({ county, accountId }: Props) {
         value={ownerName}
         onChange={(e) => setOwnerName(e.target.value)}
         placeholder="Your name as it appears on the deed (optional)"
-        className="w-full bg-white text-gray-900 placeholder-gray-400 border border-blue-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white"
+        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <button
         onClick={download}
