@@ -1,0 +1,6 @@
+.next/
+.pipeline-dist/
+node_modules/
+.env.local
+*.pdf
+packets/
