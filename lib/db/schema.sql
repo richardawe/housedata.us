@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
 CREATE TABLE counties (
   id serial PRIMARY KEY,
   slug text UNIQUE NOT NULL,
@@ -32,7 +30,7 @@ CREATE TABLE parcels (
   UNIQUE (county_id, tax_year, account_id)
 );
 
-CREATE INDEX ON parcels USING gin (situs_address gin_trgm_ops);
+CREATE INDEX ON parcels (county_id, situs_address);
 CREATE INDEX ON parcels (county_id, tax_year, neighborhood_code, state_class);
 CREATE INDEX ON parcels (county_id, tax_year, account_id);
 CREATE INDEX ON parcels (situs_zip, state_class);

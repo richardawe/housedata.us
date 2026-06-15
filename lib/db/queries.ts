@@ -49,8 +49,8 @@ export async function searchAddresses(query: string, countySlug: string, limit =
     FROM parcels p
     JOIN counties c ON c.id = p.county_id
     WHERE c.slug = ${countySlug}
-      AND p.situs_address % ${query}
-    ORDER BY similarity(p.situs_address, ${query}) DESC
+      AND p.situs_address ILIKE ${'%' + query + '%'}
+    ORDER BY p.situs_address
     LIMIT ${limit}
   `;
   return rows(result);
