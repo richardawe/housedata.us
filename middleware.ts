@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ROOT_HOSTS = ["housedata.us", "www.housedata.us"];
+const ROOT_HOSTS = ["housedata.us", "www.housedata.us", "127.0.0.1", "127.0.0.1:3000"];
 
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
