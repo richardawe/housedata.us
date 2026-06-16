@@ -8,7 +8,7 @@ const BUILD_DIR = "/home/housedataus/housedata-build";
 const DEPLOY_CMD = [
   `cd ${BUILD_DIR}`,
   "git pull origin main",
-  "npm install",
+  "npm ci",
   "rm -rf .next",
   "NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
   "cp -r .next/static .next/standalone/.next/static",
