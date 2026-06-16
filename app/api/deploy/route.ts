@@ -12,7 +12,7 @@ const DEPLOY_CMD = [
   "NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
   "cp -r .next/static .next/standalone/.next/static",
   "cp -r public .next/standalone/public",
-  "pm2 restart housedata --update-env",
+  "HOSTNAME=localhost pm2 restart housedata --update-env",
 ].join(" && ");
 
 export async function POST(req: NextRequest) {
