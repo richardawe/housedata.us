@@ -9,6 +9,7 @@ const DEPLOY_CMD = [
   `cd ${BUILD_DIR}`,
   "git pull origin main",
   "npm install",
+  "rm -rf .next",
   "NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
   "cp -r .next/static .next/standalone/.next/static",
   "cp -r public .next/standalone/public",
