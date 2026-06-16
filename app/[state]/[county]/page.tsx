@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDb } from "@/lib/db/client";
 import { getCounty } from "@/lib/db/queries";
 import { usd, num } from "@/lib/format";
+import AddressSearch from "@/components/AddressSearch";
 
 export const revalidate = 86400;
 
@@ -75,10 +76,7 @@ export default async function CountyPage({ params }: Props) {
 
         <div>
           <h2 className="text-2xl font-bold mb-4">Check your address</h2>
-          <Link href={`/${state}`}
-            className="block w-full text-center bg-blue-600 text-white font-semibold py-4 rounded-xl text-lg hover:bg-blue-700 transition">
-            Enter your address →
-          </Link>
+          <AddressSearch state={state} countySlug={county} />
         </div>
 
         <div className="text-xs text-gray-400">

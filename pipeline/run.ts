@@ -13,16 +13,26 @@
  *   - Run lib/db/schema.sql against your Neon database first
  */
 
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // fallback to .env
 import { Pool } from "pg";
-import travisConfig from "./counties/travis-tx";
+import travisConfig  from "./counties/travis-tx";
+import collinConfig  from "./counties/collin-tx";
+import harrisConfig  from "./counties/harris-tx";
+import dallasConfig  from "./counties/dallas-tx";
+import tarrantConfig from "./counties/tarrant-tx";
 import { loadRoll } from "./loader";
 import { loadTaxRates } from "./tax-rates";
 import { runCompsEngine } from "./comps-engine";
 import type { CountyConfig } from "./types";
 
 const COUNTIES: Record<string, CountyConfig> = {
-  "travis-tx": travisConfig,
+  "travis-tx":  travisConfig,
+  "collin-tx":  collinConfig,
+  "harris-tx":  harrisConfig,
+  "dallas-tx":  dallasConfig,
+  "tarrant-tx": tarrantConfig,
 };
 
 async function main() {

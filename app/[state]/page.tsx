@@ -17,9 +17,12 @@ interface Props {
   params: Promise<{ state: string }>;
 }
 
-// Map state subdomain → county slug shown on the map landing
-const STATE_LAUNCH_COUNTY: Record<string, string> = {
-  texas: "travis-tx",
+// Ordered list of live counties per state
+const STATE_COUNTIES: Record<string, { slug: string; name: string; year: number }[]> = {
+  texas: [
+    { slug: "travis-tx", name: "Travis County", year: 2025 },
+    { slug: "collin-tx", name: "Collin County",  year: 2025 },
+  ],
 };
 
 function DeadlineBanner({ stateCode }: { stateCode: string }) {
@@ -63,19 +66,21 @@ function DeadlineBanner({ stateCode }: { stateCode: string }) {
 
 export default function StatePage({ params }: Props) {
   const { state } = use(params);
-  const launchCounty = STATE_LAUNCH_COUNTY[state] ?? "";
-  const stateCode    = subdomainToStateCode(state);
+  const stateCode  = subdomainToStateCode(state);
+  const counties   = STATE_COUNTIES[state] ?? [];
 
-  const [showSearch, setShowSearch] = useState(false);
+  const [activeCounty, setActiveCounty] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  function handleTravisClick() {
-    setShowSearch(true);
+  function selectCounty(slug: string) {
+    setActiveCounty(slug);
     setTimeout(() => {
       searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       searchRef.current?.querySelector("input")?.focus();
     }, 50);
   }
+
+  const activeData = counties.find((c) => c.slug === activeCounty);
 
   if (state === "texas") {
     return (
@@ -86,27 +91,29 @@ export default function StatePage({ params }: Props) {
               Texas Property Tax Appeal
             </h1>
             <p className="text-lg text-gray-500">
-              Select your county to check how your assessment compares to similar
-              homes.
+              Select your county to check how your assessment compares to similar homes.
             </p>
           </div>
 
           <DeadlineBanner stateCode={stateCode} />
 
           <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
-            <TexasMap onTravisClick={handleTravisClick} />
+            <TexasMap
+              onTravisClick={() => selectCounty("travis-tx")}
+              onCollinClick={() => selectCounty("collin-tx")}
+            />
           </div>
 
-          {showSearch && (
+          {activeData && (
             <div
               ref={searchRef}
               className="bg-white rounded-2xl border border-blue-200 p-6 shadow-md"
             >
-              <h2 className="text-xl font-semibold mb-1">Travis County, TX</h2>
+              <h2 className="text-xl font-semibold mb-1">{activeData.name}, TX</h2>
               <p className="text-sm text-gray-500 mb-4">
-                2025 appraisal roll · Enter your address below
+                {activeData.year} appraisal roll · Enter your address below
               </p>
-              <AddressSearch state={state} countySlug={launchCounty} />
+              <AddressSearch state={state} countySlug={activeData.slug} />
             </div>
           )}
         </div>

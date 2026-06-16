@@ -15,12 +15,15 @@ interface MapData {
 
 interface Props {
   onTravisClick: () => void;
+  onCollinClick: () => void;
 }
 
 const TRAVIS_FIPS = "48453";
+const COLLIN_FIPS  = "48085";
 
 const ONBOARDED: Record<string, true> = {
   "48453": true, // Travis County
+  "48085": true, // Collin County
 };
 
 // Counties highlighted as "coming soon" in red
@@ -29,7 +32,6 @@ const COMING_SOON: Record<string, true> = {
   "48113": true, // Dallas County
   "48439": true, // Tarrant County (Fort Worth)
   "48029": true, // Bexar County (San Antonio)
-  "48085": true, // Collin County (Plano/McKinney)
   "48121": true, // Denton County
   "48157": true, // Fort Bend County (Sugar Land)
   "48339": true, // Montgomery County (The Woodlands)
@@ -37,7 +39,7 @@ const COMING_SOON: Record<string, true> = {
   "48141": true, // El Paso County
 };
 
-export default function TexasMap({ onTravisClick }: Props) {
+export default function TexasMap({ onTravisClick, onCollinClick }: Props) {
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; label: string } | null>(null);
@@ -84,6 +86,7 @@ export default function TexasMap({ onTravisClick }: Props) {
 
   function handleClick(id: string) {
     if (id === TRAVIS_FIPS) onTravisClick();
+    if (id === COLLIN_FIPS) onCollinClick();
   }
 
   return (
@@ -95,13 +98,13 @@ export default function TexasMap({ onTravisClick }: Props) {
         style={{ maxHeight: 420 }}
       >
         {mapData.paths.map(({ id, name, d }) => {
-          const isTravis = id === TRAVIS_FIPS;
+          const isOnboarded = !!ONBOARDED[id];
           const isHovered = hovered === id;
 
           const isComingSoon = !!COMING_SOON[id];
 
           let fill: string;
-          if (isTravis) {
+          if (isOnboarded) {
             fill = isHovered ? "#1d4ed8" : "#2563eb";
           } else if (isComingSoon) {
             fill = isHovered ? "#b91c1c" : "#dc2626";
@@ -116,7 +119,7 @@ export default function TexasMap({ onTravisClick }: Props) {
               fill={fill}
               stroke="#fff"
               strokeWidth={0.5}
-              style={{ cursor: isTravis || isComingSoon ? "pointer" : "default", transition: "fill 0.1s" }}
+              style={{ cursor: isOnboarded || isComingSoon ? "pointer" : "default", transition: "fill 0.1s" }}
               onMouseEnter={(e) => handleMouseEnter(e, id, name)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -125,24 +128,26 @@ export default function TexasMap({ onTravisClick }: Props) {
           );
         })}
 
-        {/* Travis County label */}
-        {(() => {
-          const travis = mapData.paths.find((p) => p.id === TRAVIS_FIPS);
-          if (!travis) return null;
-          return (
+        {/* County labels for onboarded counties */}
+        {[
+          { fips: TRAVIS_FIPS, label: "Travis", x: 522, y: 375 },
+          { fips: COLLIN_FIPS,  label: "Collin",  x: 583, y: 238 },
+        ].map(({ fips, label, x, y }) =>
+          mapData.paths.find((p) => p.id === fips) ? (
             <text
-              x={522}
-              y={375}
+              key={fips}
+              x={x}
+              y={y}
               textAnchor="middle"
               fontSize={11}
               fontWeight="bold"
               fill="white"
               style={{ pointerEvents: "none", userSelect: "none" }}
             >
-              Travis
+              {label}
             </text>
-          );
-        })()}
+          ) : null
+        )}
       </svg>
 
       {/* Tooltip for coming-soon counties */}
