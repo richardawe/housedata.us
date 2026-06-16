@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import SiteHeader from "@/components/SiteHeader";
 
 const BASE_URL = "https://housedata.us";
 
@@ -80,7 +81,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white text-gray-900 antialiased">{children}</body>
+      <body className="bg-white text-gray-900 antialiased">
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }
