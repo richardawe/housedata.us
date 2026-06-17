@@ -12,33 +12,48 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { county } = await params;
-  const data = await getCounty(county);
-  if (!data) return { title: "County not found" };
-  return {
-    title: `Protest your ${data.name} property tax — HouseData`,
-    description: `See if your home is over-assessed in ${data.name}. Free instant check backed by public appraisal data.`,
-  };
+  try {
+    const { county } = await params;
+    const data = await getCounty(county);
+    if (!data) return { title: "County not found" };
+    return {
+      title: `Protest your ${data.name} property tax — HouseData`,
+      description: `See if your home is over-assessed in ${data.name}. Free instant check backed by public appraisal data.`,
+    };
+  } catch {
+    return { title: "HouseData" };
+  }
 }
 
 export default async function CountyPage({ params }: Props) {
   const { state, county } = await params;
-  const data = await getCounty(county);
+
+  let data: Awaited<ReturnType<typeof getCounty>>;
+  try {
+    data = await getCounty(county);
+  } catch {
+    data = null;
+  }
   if (!data) notFound();
 
   const sql = getDb();
   type StatsRow = { total_analyzed: string; pct_clear: string; avg_savings: string | null };
-  const statsRows = (await sql`
-    SELECT
-      COUNT(*) AS total_analyzed,
-      ROUND(100.0 * COUNT(*) FILTER (WHERE a.savings_case = 'clear') / NULLIF(COUNT(*), 0), 1) AS pct_clear,
-      ROUND(AVG(a.annual_savings) FILTER (WHERE a.annual_savings > 0), 0) AS avg_savings
-    FROM analysis a
-    JOIN parcels p ON p.id = a.parcel_id
-    JOIN counties c ON c.id = p.county_id
-    WHERE c.slug = ${county}
-  `) as unknown as StatsRow[];
-  const stats = statsRows[0] ?? null;
+  let stats: StatsRow | null = null;
+  try {
+    const statsRows = (await sql`
+      SELECT
+        COUNT(*) AS total_analyzed,
+        ROUND(100.0 * COUNT(*) FILTER (WHERE a.savings_case = 'clear') / NULLIF(COUNT(*), 0), 1) AS pct_clear,
+        ROUND(AVG(a.annual_savings) FILTER (WHERE a.annual_savings > 0), 0) AS avg_savings
+      FROM analysis a
+      JOIN parcels p ON p.id = a.parcel_id
+      JOIN counties c ON c.id = p.county_id
+      WHERE c.slug = ${county}
+    `) as unknown as StatsRow[];
+    stats = statsRows[0] ?? null;
+  } catch {
+    // Stats unavailable — render page without the stats block
+  }
 
   return (
     <main className="min-h-screen bg-white py-12 px-4">

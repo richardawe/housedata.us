@@ -5,11 +5,13 @@ export const runtime = "nodejs";
 
 const BUILD_DIR = "/home/housedataus/housedata-build";
 
+// Build WITHOUT deleting .next first: Next.js does a full rebuild on its own,
+// and npm ci gives us clean node_modules. Keeping the old .next means the
+// running server stays healthy if the new build fails partway through.
 const DEPLOY_CMD = [
   `cd ${BUILD_DIR}`,
   "git pull origin main",
   "npm ci",
-  "rm -rf .next",
   "NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
   "cp -r .next/static .next/standalone/.next/static",
   "cp -r public .next/standalone/public",
