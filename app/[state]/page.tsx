@@ -20,7 +20,8 @@ interface Props {
 // Ordered list of live counties per state
 const STATE_COUNTIES: Record<string, { slug: string; name: string; year: number }[]> = {
   texas: [
-    { slug: "travis-tx", name: "Travis County", year: 2025 },
+    { slug: "harris-tx", name: "Harris County",  year: 2025 },
+    { slug: "travis-tx", name: "Travis County",  year: 2025 },
     { slug: "collin-tx", name: "Collin County",  year: 2025 },
   ],
 };
@@ -99,6 +100,7 @@ export default function StatePage({ params }: Props) {
 
           <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
             <TexasMap
+              onHarrisClick={() => selectCounty("harris-tx")}
               onTravisClick={() => selectCounty("travis-tx")}
               onCollinClick={() => selectCounty("collin-tx")}
             />

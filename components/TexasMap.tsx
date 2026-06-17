@@ -4,21 +4,23 @@ import { useRef, useState } from "react";
 import mapData from "@/public/texas-county-paths.json";
 
 interface Props {
+  onHarrisClick: () => void;
   onTravisClick: () => void;
   onCollinClick: () => void;
 }
 
+const HARRIS_FIPS = "48201";
 const TRAVIS_FIPS = "48453";
 const COLLIN_FIPS  = "48085";
 
 const ONBOARDED: Record<string, true> = {
+  "48201": true, // Harris County (Houston)
   "48453": true, // Travis County
   "48085": true, // Collin County
 };
 
 // Counties highlighted as "coming soon" in red
 const COMING_SOON: Record<string, true> = {
-  "48201": true, // Harris County (Houston)
   "48113": true, // Dallas County
   "48439": true, // Tarrant County (Fort Worth)
   "48029": true, // Bexar County (San Antonio)
@@ -29,7 +31,7 @@ const COMING_SOON: Record<string, true> = {
   "48141": true, // El Paso County
 };
 
-export default function TexasMap({ onTravisClick, onCollinClick }: Props) {
+export default function TexasMap({ onHarrisClick, onTravisClick, onCollinClick }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; label: string } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -59,6 +61,7 @@ export default function TexasMap({ onTravisClick, onCollinClick }: Props) {
   }
 
   function handleClick(id: string) {
+    if (id === HARRIS_FIPS) onHarrisClick();
     if (id === TRAVIS_FIPS) onTravisClick();
     if (id === COLLIN_FIPS) onCollinClick();
   }
@@ -104,8 +107,9 @@ export default function TexasMap({ onTravisClick, onCollinClick }: Props) {
 
         {/* County labels for onboarded counties */}
         {[
+          { fips: HARRIS_FIPS, label: "Harris", x: 652, y: 402 },
           { fips: TRAVIS_FIPS, label: "Travis", x: 522, y: 375 },
-          { fips: COLLIN_FIPS,  label: "Collin",  x: 583, y: 238 },
+          { fips: COLLIN_FIPS, label: "Collin", x: 583, y: 238 },
         ].map(({ fips, label, x, y }) =>
           mapData.paths.find((p) => p.id === fips) ? (
             <text

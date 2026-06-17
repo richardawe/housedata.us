@@ -46,7 +46,7 @@ async function loadBuildings(
   }
 
   await new Promise<void>((resolve, reject) => {
-    const parser = csv.parse({ columns: true, delimiter: "\t", trim: true, skip_empty_lines: true });
+    const parser = csv.parse({ columns: true, delimiter: "\t", trim: true, skip_empty_lines: true, quote: null });
     fs.createReadStream(filePath, { encoding: "latin1" }).pipe(parser);
     parser.on("readable", () => {
       let row: Record<string, string>;
@@ -79,7 +79,7 @@ async function loadParcelsFn(rollDir: string): Promise<NormalizedParcel[]> {
   const seen = new Set<string>();
 
   await new Promise<void>((resolve, reject) => {
-    const parser = csv.parse({ columns: true, delimiter: "\t", trim: true, skip_empty_lines: true });
+    const parser = csv.parse({ columns: true, delimiter: "\t", trim: true, skip_empty_lines: true, quote: null, relax_column_count: true });
     fs.createReadStream(acctPath, { encoding: "latin1" }).pipe(parser);
 
     parser.on("readable", () => {

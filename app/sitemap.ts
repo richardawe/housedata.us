@@ -15,6 +15,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE}/texas/harris-tx`,
+      changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE}/texas/travis-tx`,
       changeFrequency: "yearly",
       priority: 0.8,
