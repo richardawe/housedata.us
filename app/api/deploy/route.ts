@@ -12,7 +12,7 @@ const DEPLOY_CMD = [
   `cd ${BUILD_DIR}`,
   "git pull origin main",
   "npm ci",
-  "NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
+  "NODE_OPTIONS=--max_old_space_size=1024 NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
   "cp -r .next/static .next/standalone/.next/static",
   "cp -r public .next/standalone/public",
   "pm2 restart housedata",
