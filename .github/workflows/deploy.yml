@@ -1,13 +1,12 @@
-name: Deploy
+name: CI
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  typecheck:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -23,9 +22,3 @@ jobs:
         run: npx tsc --noEmit
         env:
           NEXT_PUBLIC_BASE_URL: https://housedata.us
-
-      - name: Trigger server build
-        run: |
-          curl -sf -X POST https://housedata.us/api/deploy \
-            -H "Authorization: Bearer ${{ secrets.DEPLOY_SECRET }}" \
-            --max-time 15
