@@ -1,17 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
-interface CountyPath {
-  id: string;
-  name: string;
-  d: string;
-}
-
-interface MapData {
-  viewBox: string;
-  paths: CountyPath[];
-}
+import { useRef, useState } from "react";
+import mapData from "@/public/texas-county-paths.json";
 
 interface Props {
   onTravisClick: () => void;
@@ -40,25 +30,9 @@ const COMING_SOON: Record<string, true> = {
 };
 
 export default function TexasMap({ onTravisClick, onCollinClick }: Props) {
-  const [mapData, setMapData] = useState<MapData | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; label: string } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    fetch("/texas-county-paths.json")
-      .then((r) => r.json())
-      .then(setMapData)
-      .catch(console.error);
-  }, []);
-
-  if (!mapData) {
-    return (
-      <div className="w-full aspect-[960/680] flex items-center justify-center text-gray-400">
-        Loading map…
-      </div>
-    );
-  }
 
   function handleMouseEnter(e: React.MouseEvent<SVGPathElement>, id: string, name: string) {
     setHovered(id);
