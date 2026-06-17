@@ -8,13 +8,18 @@ const BUILD_DIR = "/home/housedataus/housedata-build";
 // Build WITHOUT deleting .next first: Next.js does a full rebuild on its own,
 // and npm ci gives us clean node_modules. Keeping the old .next means the
 // running server stays healthy if the new build fails partway through.
+// After building, replace the generated standalone server with our custom server.js
+// that serves static assets via Next.js getRequestHandler. The generated standalone
+// server.js expects a reverse proxy in front for /_next/static/* and returns 404
+// for those requests on its own.
 const DEPLOY_CMD = [
   `cd ${BUILD_DIR}`,
   "git pull origin main",
   "npm ci",
   "NODE_OPTIONS=--max_old_space_size=1024 NEXT_PUBLIC_BASE_URL=https://housedata.us npm run build",
-  "cp -r .next/static .next/standalone/.next/static",
-  "cp -r public .next/standalone/public",
+  "cp server.js .next/standalone/server.js",
+  "mkdir -p .next/standalone/.next/static && cp -r .next/static/. .next/standalone/.next/static/",
+  "mkdir -p .next/standalone/public && cp -r public/. .next/standalone/public/",
   "pm2 restart housedata",
 ].join(" && ");
 
