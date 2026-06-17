@@ -12,26 +12,41 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { county, account_id } = await params;
-  const parcel = await getParcelWithAnalysis(county, account_id);
-  if (!parcel) return { title: "Property not found" };
-  return {
-    title: `${parcel.situs_address} — HouseData`,
-    description: parcel.pct_above
-      ? `This property is assessed ~${pct(parcel.pct_above)} above comparable homes.`
-      : "See how this property compares to similar homes nearby.",
-  };
+  try {
+    const { county, account_id } = await params;
+    const parcel = await getParcelWithAnalysis(county, account_id);
+    if (!parcel) return { title: "Property not found" };
+    return {
+      title: `${parcel.situs_address} — HouseData`,
+      description: parcel.pct_above
+        ? `This property is assessed ~${pct(parcel.pct_above)} above comparable homes.`
+        : "See how this property compares to similar homes nearby.",
+    };
+  } catch {
+    return { title: "HouseData" };
+  }
 }
 
 export default async function ResultPage({ params }: Props) {
   const { state, county, account_id } = await params;
-  const parcel = await getParcelWithAnalysis(county, account_id);
+
+  let parcel: Awaited<ReturnType<typeof getParcelWithAnalysis>>;
+  try {
+    parcel = await getParcelWithAnalysis(county, account_id);
+  } catch {
+    parcel = null;
+  }
   if (!parcel) notFound();
 
   const hasAnalysis = parcel.comp_count != null && parcel.comp_count > 0;
-  const teaserComps = hasAnalysis && parcel.comp_ids
-    ? await getCompRows(parcel.comp_ids.slice(0, 3).map(String))
-    : [];
+  let teaserComps: Awaited<ReturnType<typeof getCompRows>> = [];
+  try {
+    teaserComps = hasAnalysis && parcel.comp_ids
+      ? await getCompRows(parcel.comp_ids.slice(0, 3).map(String))
+      : [];
+  } catch {
+    teaserComps = [];
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 py-10 px-4">
